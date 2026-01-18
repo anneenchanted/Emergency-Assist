@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Emergency History | Emergency Assist+</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="dashboard">
+  <h3>📄 Emergency History</h3>
+
+  <table>
+    <thead>
+  <tr>
+    <th>Date</th>
+    <th>Time</th>
+    <th>❤️ Heart Rate</th>
+    <th>🤕 Fall</th>
+    <th>Status</th>
+  </tr>
+</thead>
+    <tbody id="historyTable"></tbody>
+  </table>
+
+  <button class="secondary" onclick="goBack()">⬅ Back</button>
+</div>
+
+<script src="firebase.js"></script>
+<script>
+// AUTH CHECK
+firebase.auth().onAuthStateChanged(user=>{
+  if(!user){
+    window.location.href = "index.html";
+  } else {
+    loadHistory(user.uid);
+  }
+});
+
+// LOAD HISTORY
+function loadHistory(uid){
+  firebase.firestore().collection("emergencies")
+    .where("user","==",uid)
+    .orderBy("time","desc")
+    .onSnapshot(snapshot=>{
+      const table = document.getElementById("historyTable");
+      table.innerHTML = "";
+
+      snapshot.forEach(doc=>{
+  const data = doc.data();
+  const date = data.time.toDate();
+
+  table.innerHTML += `
+    <tr>
+      <td>${date.toLocaleDateString()}</td>
+      <td>${date.toLocaleTimeString()}</td>
+      <td>${data.heartRate || "--"} bpm</td>
+      <td>${data.fallDetected ? "YES" : "NO"}</td>
+      <td>${data.status}</td>
+    </tr>
+  `;
+});
+}
+
+// BACK BUTTON
+function goBack(){
+  history.back();
+}
+</script>
+
+</body>
+</html>

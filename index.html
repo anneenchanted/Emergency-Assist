@@ -1,1 +1,35 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <title>Emergency Assist+</title>  
+  <link rel="stylesheet" href="style.css">    <!-- Firebase SDK -->    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>  </head>  
+<body>  <div class="card">  
+  <div class="logo">  <h2>Emergency Assist+</h2>  
+<p>Real-time Health Monitoring & Emergency Response</p>
 
+  </div>    <input type="email" id="email" placeholder="Email">  
+  <input type="password" id="password" placeholder="Password">    <div class="radio-group">  
+    <label><input type="radio" name="role" value="patient" checked> Login as Patient</label>  
+    <label><input type="radio" name="role" value="monitor"> Login as Monitor</label>  
+  </div>  <button onclick="login()">LOGIN</button>
+
+  <p class="link">  
+    Don’t have an account?  
+    <a href="register.html">Register here</a>  
+  </p>  
+</div>  <!-- Firebase Init -->  <script src="firebase.js"></script>  <script>  
+function login(){  
+  const email = document.getElementById("email").value;  
+  const password = document.getElementById("password").value;  
+  const role = document.querySelector('input[name="role"]:checked').value;  
+  
+  auth.signInWithEmailAndPassword(email, password)  
+    .then(() => {  
+      window.location.href = role === "patient"  
+        ? "patient.html"  
+        : "monitor.html";  
+    })  
+    .catch(err => alert(err.message));  
+}  
+</script>  </body>  
+</html>  

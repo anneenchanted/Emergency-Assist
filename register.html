@@ -1,0 +1,87 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <title>Register | Emergency Assist+</title>  
+  <link rel="stylesheet" href="style.css">    <!-- Firebase -->    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>  </head>  
+<body> 
+  <div class="card">  
+  <h3>Step 1 of 2</h3>  
+  <progress value="50" max="100"></progress>   
+    <input type="text" id="fullname" placeholder="Full Name">  
+  <input type="email" id="email" placeholder="Email">  
+  <input type="password" id="password" placeholder="Password">  
+  <input type="password" id="confirm" placeholder="Confirm Password">  
+    <div class="radio-group">  
+    <label><input type="radio" name="role" value="patient" checked> Register as Patient</label>  
+    <label><input type="radio" name="role" value="monitor"> Register as Monitor</label>  
+  </div>   
+    <div id="monitorFields" style="display:none;">  
+    <input type="text" id="relation" placeholder="Relationship to Patient">  
+    <input type="text" id="phone" placeholder="Phone Number">  <label class="switch">  
+  <input type="checkbox" id="alerts" checked>  
+  <span class="slider"></span>  
+</label>  
+<small>Receive emergency alerts & live location</small>
+
+  </div> 
+    <button onclick="register()">NEXT</button>
+
+  <script src="firebase.js"></script>
+<script>
+const roleRadios = document.querySelectorAll('input[name="role"]');
+const monitorFields = document.getElementById('monitorFields');
+
+roleRadios.forEach(radio => {
+  radio.addEventListener('change', () => {
+    monitorFields.style.display =
+      radio.value === "monitor" && radio.checked ? "block" : "none";
+  });
+});
+
+function register(){
+  const fullName = document.getElementById("fullname").value;
+  const emailVal = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+  const confirmPass = document.getElementById("confirm").value;
+  const role = document.querySelector('input[name="role"]:checked').value;
+
+  if(pass !== confirmPass){
+    alert("Passwords do not match");
+    return;
+  }
+
+  const relationVal = document.getElementById("relation")
+    ? document.getElementById("relation").value
+    : "";
+
+  const phoneVal = document.getElementById("phone")
+    ? document.getElementById("phone").value
+    : "";
+
+  const alertsVal = document.getElementById("alerts")
+    ? document.getElementById("alerts").checked
+    : false;
+
+  auth.createUserWithEmailAndPassword(emailVal, pass)
+    .then(cred => {
+      return db.collection("users")
+        .doc(cred.user.uid)
+        .set({
+          fullName,
+          email: emailVal,
+          role,
+          relation: relationVal,
+          phone: phoneVal,
+          alerts: alertsVal,
+          createdAt: new Date()
+        });
+    })
+    .then(()=>{
+      window.location.href =
+        role === "patient" ? "patient.html" : "monitor.html";
+    })
+    .catch(err => alert(err.message));
+}
+</script>  
+ </body>  
+</html>
